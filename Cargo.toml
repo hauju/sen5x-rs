@@ -1,0 +1,21 @@
+[package]
+name = "sen5x"
+version = "0.0.1"
+authors = ["Hauke Jung <hauke.jung@outlook.de>"]
+documentation = "https://docs.rs/sen5x"
+repository = "https://github.com/hauju/sen5x-rs.git"
+license = "MIT OR Apache-2.0"
+description = "Rust driver for the Sensirion SEN5x series. All-in-one sensor solution platform for the accurate measurement of various environmental parameters, such as particulate matter, volatile organic compounds (VOCs), oxidizing gases, such as nitrogen oxide compounds (NOx), as well as humidity & temperature"
+keywords = ["sen5x", "sensirion", "driver", "embedded-hal-driver"]
+categories = ["embedded", "no-std"]
+readme = "README.md"
+edition = "2021"
+
+[dependencies]
+sensirion-i2c = "0.2"
+embedded-hal = "0.2"
+
+
+[dev-dependencies]
+linux-embedded-hal = "0.3"
+embedded-hal-mock = "0.9"
