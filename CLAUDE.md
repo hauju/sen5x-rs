@@ -4,32 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`no_std` Rust driver for the Sensirion SEN5x environmental sensor series (PM, VOC, NOx, humidity, temperature). Communicates over I2C using `embedded-hal` 0.2 blocking traits. Early development stage.
+`no_std` Rust driver for the Sensirion SEN5x environmental sensor series (PM, VOC, NOx, humidity, temperature). Communicates over I2C using `embedded-hal` 1.0 blocking traits with optional `embedded-hal-async` support. Based on the Sensirion C reference implementation and follows the same patterns as the scd4x-rs driver.
 
 ## Build & Test Commands
 
 ```bash
-cargo build          # Build the library
-cargo test           # Run tests (uses embedded-hal-mock)
-cargo doc --open     # Generate and view docs
-```
-
-Cross-compile for embedded targets (e.g. Raspberry Pi Pico):
-```bash
-cargo build --target thumbv6m-none-eabi --example rp
+cargo build                                # Build the library
+cargo test                                 # Run tests (uses embedded-hal-mock)
+cargo clippy                               # Lint
+cargo doc --open                           # Generate and view docs
+cargo build --features embedded-hal-async  # Build with async support
+cargo build --features defmt               # Build with defmt support
 ```
 
 ## Architecture
 
-- **`sen5x.rs`** — Main driver struct `Sen5x<I2C, D>` generic over I2C bus and delay. All sensor operations go through `write_command` (write-only) or `delayed_read_cmd` (write then read with CRC validation via `sensirion-i2c`). The I2C address is fixed at `0x69`.
-- **`commands.rs`** — `Command` enum mapping sensor operations to `(u16_command_code, u32_delay_ms)` tuples.
-- **`types.rs`** — Data structs: `SensorData` (f32 scaled values), `SensorDataInt` (raw integer ticks), `SensorDataRaw`, `VersionInfo`.
-- **`utils.rs`** — Buffer parsing helpers (`get_u16_from_buf`, etc.) for extracting values from I2C response buffers that include CRC bytes at every 3rd position.
-- **`error.rs`** — Error type wrapping I2C errors and CRC failures, with conversion from `sensirion_i2c::i2c::Error`.
+- **`sen5x/mod.rs`** — Main driver struct `Sen5x<I2C, D>` generic over I2C bus and delay. Tracks `is_running` state to enforce command validity (idle-only vs allowed-during-measurement). All sensor operations go through internal helpers: `write_command`, `write_command_with_data` (single u16), `write_command_with_words` (multi-word), and `delayed_read_cmd`. I2C address is fixed at `0x69`.
+- **`sen5x/async_impl.rs`** — `Sen5xAsync<I2C, D>` mirroring all public methods as `async fn`. Uses `sensirion_i2c::i2c_async`.
+- **`commands.rs`** — `Command` enum (28 variants) mapping to `(u16_command_code, u32_delay_ms, bool_allowed_if_running)` tuples.
+- **`types.rs`** — Data structs: `SensorData` (f32 scaled), `RawSensorData` (integer ticks), `RawMeasurementValues`, `PmValues` (extended PM), `TemperatureOffsetParameters`, `AlgorithmTuningParameters`, `VersionInfo`.
+- **`error.rs`** — Error type wrapping I2C errors and CRC failures, with optional `defmt` and `thiserror` support.
 
 ## Key Conventions
 
-- The library is `#![no_std]` (std only enabled in test cfg).
-- I2C response buffers use Sensirion's format: 2 data bytes + 1 CRC byte per word. Buffer index offsets in `read_measured_values_as_integers` step by 3 to skip CRC bytes.
-- `Command::as_tuple()` returns `(command_code, delay_ms)` — some call sites destructure a 3-tuple `(cmd, _, _)` in tests.
-- Tests use `embedded-hal-mock` for I2C and delay mocking.
+- The library is `#![no_std]` (std only enabled in test cfg or via `std` feature).
+- I2C response buffers use Sensirion's format: 2 data bytes + 1 CRC byte per word. Buffer indices skip every 3rd byte for CRC.
+- Multi-word write commands (temperature offset, algorithm tuning, VOC state, fan interval) use `write_command_with_words` with a stack-allocated `[u8; 20]` buffer.
+- Serial number and product name are ASCII strings returned as `[u8; 32]`.
+- Tests use `embedded-hal-mock::eh1` with `NoopDelay`, `word()` helper for CRC, and `destroy()` + `done()` pattern.
+- Features: `embedded-hal-async`, `defmt`, `thiserror`, `std`.

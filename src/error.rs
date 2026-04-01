@@ -1,31 +1,42 @@
-
-use embedded_hal::blocking::i2c::{Read, Write};
+use embedded_hal as hal;
 use sensirion_i2c::i2c;
 
 /// SEN5x errors
 #[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg_attr(feature = "thiserror", derive(thiserror::Error))]
 pub enum Error<E> {
-    /// I²C bus error
     #[cfg_attr(feature = "thiserror", error("I2C: {0}"))]
+    /// I²C bus error
     I2c(E),
-    /// CRC checksum validation failed
     #[cfg_attr(feature = "thiserror", error("CRC"))]
+    /// CRC checksum validation failed
     Crc,
-    /// Not allowed when periodic measurement is running
     #[cfg_attr(feature = "thiserror", error("Not Allowed"))]
+    /// Not allowed when periodic measurement is running
     NotAllowed,
-    /// Internal fail
     #[cfg_attr(feature = "thiserror", error("Internal"))]
-    Internal
+    /// Internal fail
+    Internal,
 }
 
-impl<E, I2cWrite, I2cRead> From<i2c::Error<I2cWrite, I2cRead>> for Error<E>
+#[cfg(not(feature = "thiserror"))]
+impl<E: core::fmt::Debug> core::fmt::Display for Error<E> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Error::I2c(e) => write!(f, "I2C: {e:?}"),
+            Error::Crc => write!(f, "CRC"),
+            Error::NotAllowed => write!(f, "Not Allowed"),
+            Error::Internal => write!(f, "Internal"),
+        }
+    }
+}
+
+impl<I2C> From<i2c::Error<I2C>> for Error<I2C::Error>
 where
-    I2cWrite: Write<Error = E>,
-    I2cRead: Read<Error = E>,
+    I2C: hal::i2c::ErrorType,
 {
-    fn from(err: i2c::Error<I2cWrite, I2cRead>) -> Self {
+    fn from(err: i2c::Error<I2C>) -> Self {
         match err {
             i2c::Error::Crc => Error::Crc,
             i2c::Error::I2cWrite(e) => Error::I2c(e),

@@ -1,6 +1,6 @@
 [package]
 name = "sen5x"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Hauke Jung <hauke.jung@outlook.de>"]
 documentation = "https://docs.rs/sen5x"
 repository = "https://github.com/hauju/sen5x-rs.git"
@@ -9,13 +9,25 @@ description = "Rust driver for the Sensirion SEN5x series. All-in-one sensor sol
 keywords = ["sen5x", "sensirion", "driver", "embedded-hal-driver"]
 categories = ["embedded", "no-std"]
 readme = "README.md"
-edition = "2021"
+edition = "2024"
+
+[features]
+embedded-hal-async = ["dep:embedded-hal-async", "sensirion-i2c/embedded-hal-async"]
+defmt = ["dep:defmt"]
+thiserror = ["dep:thiserror", "std"]
+std = []
+default = []
 
 [dependencies]
-sensirion-i2c = "0.2"
-embedded-hal = "0.2"
+sensirion-i2c = "0.4.0"
+embedded-hal = "1.0.0"
+embedded-hal-async = { version = "1.0.0", optional = true }
 
+defmt = { version = "0.3", optional = true }
+thiserror = { version = "2.0.12", optional = true }
 
 [dev-dependencies]
-linux-embedded-hal = "0.3"
-embedded-hal-mock = "0.9"
+embedded-hal-mock = "0.11.1"
+
+[target.'cfg(any(target_os = "linux", target_os = "android"))'.dev-dependencies]
+linux-embedded-hal = "0.4.0"
