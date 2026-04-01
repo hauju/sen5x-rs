@@ -5,19 +5,21 @@
 //!
 //! ## `embedded-hal-async` Support
 //!
-//! This crate has optional support for the [`embedded-hal-async`] crate. The
-//! [`Sen5xAsync`] type provides a driver for a SEN5x sensor which uses
-//! [`embedded-hal-async`]'s asynchronous versions of the `I2c` and `DelayNs`
-//! traits, rather than the blocking versions from [`embedded-hal`].
+//! This crate has optional support for the
+//! [`embedded-hal-async`](https://docs.rs/embedded-hal-async/) crate. The
+//! `Sen5xAsync` type provides a driver for a SEN5x sensor which uses
+//! `embedded-hal-async`'s asynchronous versions of the `I2c` and `DelayNs`
+//! traits, rather than the blocking versions from
+//! [`embedded-hal`](https://docs.rs/embedded-hal/).
 //!
-//! The [`embedded-hal-async`] support is feature flagged, so that users who
+//! The `embedded-hal-async` support is feature flagged, so that users who
 //! don't need the asynchronous versions of these traits don't have to depend on
 //! `embedded-hal-async`. To use it, enable the `embedded-hal-async` feature
 //! flag in your `Cargo.toml`:
 //!
 //! ```toml
 //! [dependencies]
-//! sen5x = { version = "0.1", features = ["embedded-hal-async"] }
+//! sen5x = { version = "0.2", features = ["embedded-hal-async"] }
 //! ```
 
 #![deny(unsafe_code)]

@@ -18,6 +18,7 @@ where
     I2C: I2c<Error = E>,
     D: DelayNs,
 {
+    /// Create a new async SEN5x driver instance.
     pub fn new(i2c: I2C, delay: D) -> Self {
         Self {
             i2c,
