@@ -21,6 +21,7 @@
 //! ```
 
 #![deny(unsafe_code)]
+#![warn(missing_docs)]
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 
 mod sen5x;
@@ -32,6 +33,8 @@ pub use crate::sen5x::Sen5xAsync;
 mod error;
 pub use error::Error;
 
+/// SEN5x I2C command definitions.
 pub mod commands;
 
+/// Sensor data types and configuration structures.
 pub mod types;

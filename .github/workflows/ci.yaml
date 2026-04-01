@@ -1,26 +1,79 @@
-name: Continuous Integration and Deployment
+name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
-        with:
-            profile: minimal
-            toolchain: stable
-            target: armv7-unknown-linux-gnueabihf
-            override: true
-          
+      - uses: dtolnay/rust-toolchain@stable
+
       - name: Build
-        run: cargo build --release --verbose
-        
+        run: cargo build
+
+      - name: Build (embedded-hal-async)
+        run: cargo build --features embedded-hal-async
+
+      - name: Build (defmt)
+        run: cargo build --features defmt
+
+      - name: Build (thiserror)
+        run: cargo build --features thiserror
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Clippy (all features)
+        run: cargo clippy --all-features -- -D warnings
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build docs
+        run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: "-D warnings"

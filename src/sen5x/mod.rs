@@ -30,6 +30,7 @@ where
     I2C: I2c<Error = E>,
     D: DelayNs,
 {
+    /// Create a new SEN5x driver instance.
     pub fn new(i2c: I2C, delay: D) -> Self {
         Sen5x {
             i2c,
@@ -620,10 +621,7 @@ mod tests {
         assert_eq!(sensor.serial_number(), Err(Error::NotAllowed));
         assert_eq!(sensor.version(), Err(Error::NotAllowed));
         assert_eq!(sensor.product_name(), Err(Error::NotAllowed));
-        assert_eq!(
-            sensor.set_warm_start_parameter(100),
-            Err(Error::NotAllowed)
-        );
+        assert_eq!(sensor.set_warm_start_parameter(100), Err(Error::NotAllowed));
 
         let mut mock = sensor.destroy();
         mock.done();

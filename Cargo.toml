@@ -1,6 +1,6 @@
 [package]
 name = "sen5x"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Hauke Jung <hauke.jung@outlook.de>"]
 documentation = "https://docs.rs/sen5x"
 repository = "https://github.com/hauju/sen5x-rs.git"
@@ -10,6 +10,7 @@ keywords = ["sen5x", "sensirion", "driver", "embedded-hal-driver"]
 categories = ["embedded", "no-std"]
 readme = "README.md"
 edition = "2024"
+rust-version = "1.85"
 
 [features]
 embedded-hal-async = ["dep:embedded-hal-async", "sensirion-i2c/embedded-hal-async"]

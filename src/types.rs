@@ -26,13 +26,21 @@ pub struct SensorData {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct RawSensorData {
+    /// Mass concentration PM1.0 (raw ticks, divide by 10 for µg/m³)
     pub mass_concentration_pm1p0: u16,
+    /// Mass concentration PM2.5 (raw ticks, divide by 10 for µg/m³)
     pub mass_concentration_pm2p5: u16,
+    /// Mass concentration PM4.0 (raw ticks, divide by 10 for µg/m³)
     pub mass_concentration_pm4p0: u16,
+    /// Mass concentration PM10.0 (raw ticks, divide by 10 for µg/m³)
     pub mass_concentration_pm10p0: u16,
+    /// Ambient humidity (raw ticks, divide by 100 for %)
     pub ambient_humidity: i16,
+    /// Ambient temperature (raw ticks, divide by 200 for °C)
     pub ambient_temperature: i16,
+    /// VOC index (raw ticks, divide by 10 for index value)
     pub voc_index: i16,
+    /// NOx index (raw ticks, divide by 10 for index value)
     pub nox_index: i16,
 }
 
@@ -40,9 +48,13 @@ pub struct RawSensorData {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct RawMeasurementValues {
+    /// Raw humidity ticks
     pub raw_humidity: i16,
+    /// Raw temperature ticks
     pub raw_temperature: i16,
+    /// Raw VOC ticks (unprocessed, no algorithm applied)
     pub raw_voc: u16,
+    /// Raw NOx ticks (unprocessed, no algorithm applied)
     pub raw_nox: u16,
 }
 
@@ -106,11 +118,18 @@ pub struct AlgorithmTuningParameters {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct VersionInfo {
+    /// Firmware major version
     pub firmware_major: u8,
+    /// Firmware minor version
     pub firmware_minor: u8,
+    /// Firmware debug mode enabled
     pub firmware_debug: bool,
+    /// Hardware major version
     pub hardware_major: u8,
+    /// Hardware minor version
     pub hardware_minor: u8,
+    /// I2C protocol major version
     pub protocol_major: u8,
+    /// I2C protocol minor version
     pub protocol_minor: u8,
 }
